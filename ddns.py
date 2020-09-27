@@ -6,6 +6,7 @@ https://github.com/andyjsmith/Vultr-Dynamic-DNS
 '''
 
 import json, requests
+import netifaces as ni
 
 # Import the values from the configuration file
 with open("config.json") as config_file:
@@ -16,7 +17,11 @@ api_key = config["api_key"]
 dynamic_records = config["dynamic_records"]
 
 # Get the public IP of the server
-ip = requests.get("https://ip.42.pl/raw").text
+#ip = requests.get("https://ip.42.pl/raw").text
+for interface in ni.interfaces():
+        ip = ni.ifaddresses(interface)[ni.AF_INET][0]['addr']
+        if '192.' in ip:
+            ip=ip
 
 # Get the list of DNS records from Vultr to translate the record name to recordid
 raw_records = json.loads(requests.get("https://api.vultr.com/v1/dns/records?domain=" + domain, headers={"API-Key": api_key}).text)
